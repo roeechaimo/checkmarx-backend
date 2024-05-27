@@ -1,11 +1,14 @@
-const fs = require('fs');
+const JsonReader = require('./../../services/jsonReader');
+const jsonReader = new JsonReader('./mocks/microservices/microservices.json');
 
 module.exports = function (app) {
   app.get('/api/microservices', async function (_req, res) {
-    fs.readFile('./mocks/microservices/microservices.json', (_err, json) => {
-      res.status(200);
+    try {
+      const json = await jsonReader.readJson();
 
-      return res.json(JSON.parse(json));
-    });
+      return res.status(200).json(json);
+    } catch (e) {
+      return res.status(500).json(jsonReader.generateError(e));
+    }
   });
 };
